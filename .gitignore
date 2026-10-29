@@ -1,0 +1,5 @@
+build/
+.xmake/
+MEMORY
+releases
+.token-optimizer

@@ -1,0 +1,31 @@
+Attack Warp changelog
+
+0.3.0 (2026-10-29)
+- Stretch follows the gap still to close: none once inside the brake zone, full fMaxScale at fStretchRange (150) beyond it,
+  smooth between. Close swings now play as animated instead of speeding up to 1.8x and braking hard (likely "snap" source).
+- Turn: during wind-up and swing the attacker turns toward its target (fTurnRate 300 deg/s, spring fTurnEase 0.08 s, only
+  within fMaxTurnAngle 90). The player is skipped while True Directional Movement steers (directional mode or lock-on).
+- Lead: stretch and turn aim at where a moving target will be fLeadTime (0.25 s) ahead, at most fMaxLead (80) away. The brake
+  still uses the target's real position.
+- Combo target stickiness: the player's previous target keeps its pick unless another scores fTargetStickiness (0.3) better.
+- True Directional Movement: its locked target is the player's target (bTDMTarget).
+- Precision: the stop distance moves with the weapon's attack collision length (bPrecisionReach, fReachRef 60, fReachWeight 1),
+  read once per swing on the main thread; never inside body contact (45). Without Precision: fixed distances as before.
+- Power and charge attacks use fMaxStartDistPower (700) instead of fMaxStartDist.
+- The player's target is held by handle for the frame (was a raw pointer looked up by FormID).
+- Debug swing line adds: power, degrees turned, Precision length ("capsule"), target speed.
+
+0.2.0 (2026-10-27)
+- Stretch factor follows its target through a critically damped spring (after orangeduck's spring.h, MIT) instead of a
+  first-order ease: same fStretchEase meaning (63% in that time), but no sudden acceleration when a stretch starts or ends.
+- Brake factor is sprung too (new fBrakeEase, 0.05 s; 0 = 0.1.0 behaviour): when the target steps in or its body enters the
+  path, the brake tapers instead of jumping. The hard clamp to the stop line still holds every frame.
+- Load-time self-check covers the spring.
+
+0.1.0 (2026-10-27)
+- First version, built from MotionWarpProbe 0.2.2 (runs 1-4) with the user's feedback "sometimes it feels like snapping".
+- Hook: MovementTweenerAgentAnimationDriven second vtable slot 3 (SE 41160 / AE 42246), forward root motion of melee attacks only.
+- Stretch eased (fStretchEase 0.12 s) up to fMaxScale 1.8 during wind-up and swing (attack states draw/swing; ends one frame after HitFrame).
+- Brake: forward path kept fStopDistPlayer 70 / fStopDistNpc 100 from the target centre, smooth taper over fBrakeZone 60.
+- Player target per swing from hostile actors inside fTargetCone 60 deg (refreshed on combat events and while attacking).
+- SKSE Menu Framework page, AttackWarp.ini + AttackWarp_User.ini, quiet log with optional per-swing lines, load-time math self-check.
